@@ -68,7 +68,8 @@ namespace RockPaperScissors
         public static void ShowRules()
         {
             Console.Clear();
-            Console.WriteLine("#Rules:\n");
+            Console.WriteLine("#Friends Rules:\n");
+
             foreach (var weapon in WeaponCollection.Weapons)
             {
                 Console.Write($"{weapon.Name} beats ");
@@ -84,7 +85,7 @@ namespace RockPaperScissors
                     }
                 }
             }
-            Console.WriteLine("Win three rounds.\n");
+            Console.WriteLine("\nWin three rounds.\n");
             Console.WriteLine("Press enter to continue");
             Console.ReadLine();
         }
