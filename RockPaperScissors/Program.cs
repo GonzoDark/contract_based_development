@@ -8,13 +8,12 @@ namespace RockPaperScissors
 {
     class Program
     {
-        enum HandType { Rock, Paper, Scissors };
+        static WeaponRepository WeaponCollection = new WeaponRepository();
         enum MainMenuSelection { StartGame, ShowRules, EndGame };
         enum SubMenuSelection { NextRound, ShowStatus, GiveUp }; //
         static void Main(string[] args)
         {
-            
-        int UserInput;
+            int UserInput;
             do
             {
                 Console.Clear();
@@ -39,14 +38,14 @@ namespace RockPaperScissors
                             defineHand(players);
                             compareHands(players);
                         }
-                        if(UserInput == (int)SubMenuSelection.ShowStatus + 1)
+                        if (UserInput == (int)SubMenuSelection.ShowStatus + 1)
                         {
                             ShowStatus(players);
-                        }            
+                        }
 
                     } while (!hasWonYet(players));
                     Console.Clear();
-                    if(players[0].RoundsWon == 3)
+                    if (players[0].RoundsWon == 3)
                     {
                         Console.WriteLine($"{players[0].Name} won the game!");
                         Console.WriteLine("Press enter to continue");
@@ -59,7 +58,7 @@ namespace RockPaperScissors
                         Console.ReadLine();
                     }
                 }
-                if(UserInput == (int)MainMenuSelection.ShowRules + 1)
+                if (UserInput == (int)MainMenuSelection.ShowRules + 1)
                 {
                     ShowRules();
                 }
@@ -69,8 +68,23 @@ namespace RockPaperScissors
         public static void ShowRules()
         {
             Console.Clear();
-            Console.WriteLine("#Rules:\n"+"1) Rock beats scissors\n2) Scissors beats paper\n3) Paper beats rock\n"+
-                "Win three rounds.\n");
+            Console.WriteLine("#Rules:\n");
+            foreach (var weapon in WeaponCollection.Weapons)
+            {
+                Console.Write($"{weapon.Name} beats ");
+                foreach (var weaponBeats in weapon.Beats)
+                {
+                    if (weaponBeats == weapon.Beats.LastOrDefault())
+                    {
+                        Console.Write($"{weaponBeats}\n");
+                    }
+                    else
+                    {
+                        Console.Write($"{weaponBeats} and ");
+                    }
+                }
+            }
+            Console.WriteLine("Win three rounds.\n");
             Console.WriteLine("Press enter to continue");
             Console.ReadLine();
         }
@@ -92,7 +106,7 @@ namespace RockPaperScissors
             {
                 Console.Clear();
                 string name;
-                Console.WriteLine($"Player {i+1}, enter your name");
+                Console.WriteLine($"Player {i + 1}, enter your name");
                 name = Console.ReadLine();
                 players.Add(new Player { Name = name });
             }
@@ -101,54 +115,38 @@ namespace RockPaperScissors
 
         public static List<Player> defineHand(List<Player> players)
         {
-
-            foreach (Player p in players) //0 --> 1
+            foreach (Player p in players)
             {
                 Console.Clear();
                 Console.WriteLine($"{p.Name} select your hand");
-                Console.WriteLine("1) Rock\n2) Paper\n3) Scissor");
-                
-                p.Hand = int.Parse(Console.ReadLine()) -1;
+
+                int counter = 1;
+                foreach (Weapon weapon in WeaponCollection.Weapons)
+                {
+                    Console.WriteLine($"{counter}) {weapon.Name}");
+                    counter++;
+                }
+
+                p.Hand = WeaponCollection.Weapons[int.Parse(Console.ReadLine()) - 1];
             }
             return players;
         }
 
         public static string CompareHandsHelper(List<Player> players)
-        {           
-            if (players[0].Hand == players[1].Hand)
+        {
+            if (players[0].Hand.Name == players[1].Hand.Name)
             {
                 return "Draw";
             }
 
-            if (players[0].Hand == (int)HandType.Rock  && players[1].Hand == (int)HandType.Scissors ) // Rock vs Scissors = Rock wins	
+            foreach (string Weapon in players[0].Hand.Beats)
             {
-                return players[0].Name;
+                if (Weapon == players[1].Hand.Name)
+                {
+                    return players[0].Name;
+                }
             }
-
-            if (players[0].Hand == (int)HandType.Rock && players[1].Hand == (int)HandType.Paper) // Rock vs Paper = Paper wins
-            {
-                return players[1].Name;
-            }
-
-            if (players[0].Hand == (int)HandType.Scissors  && players[1].Hand == (int)HandType.Rock ) // Scissors vs Rock = Rock wins	
-            {
-                return players[1].Name;
-            }
-
-            if (players[0].Hand == (int)HandType.Scissors  && players[1].Hand == (int)HandType.Paper ) //Scissors vs Paper = Scissors wins	
-            {
-                return players[0].Name;
-            }
-
-            if (players[0].Hand == (int)HandType.Paper  && players[1].Hand == (int)HandType.Scissors ) //Paper vs Scissors = Scissors wins	
-            {
-                return players[1].Name;
-            }
-
-            else // Paper vs Rock = Paper wins
-            {
-                return players[0].Name;
-            }
+            return players[1].Name;
         }
 
         public static bool hasWonYet(List<Player> players)
@@ -159,7 +157,6 @@ namespace RockPaperScissors
                 {
                     return true;
                 }
-
             }
             return false;
         }
@@ -171,19 +168,19 @@ namespace RockPaperScissors
             if (winner == players[0].Name)
             {
                 players[0].RoundsWon += 1;
-                Console.WriteLine($"{players[0].Name} selected {(HandType)players[0].Hand}\n"
-                                 +$"{players[1].Name} selected {(HandType)players[1].Hand}\n");
-                Console.WriteLine($"{(HandType)players[0].Hand} beats {(HandType)players[1].Hand}!\n"
-                                 +$"{players[0].Name} wins this round!\n");
+                Console.WriteLine($"{players[0].Name} selected {players[0].Hand.Name}\n"
+                                 + $"{players[1].Name} selected {players[1].Hand.Name}\n");
+                Console.WriteLine($"{players[0].Hand.Name} beats {players[1].Hand.Name}!\n"
+                                 + $"{players[0].Name} wins this round!\n");
                 Console.WriteLine("Press enter to continue");
                 Console.ReadLine();
             }
             else if (winner == players[1].Name)
             {
                 players[1].RoundsWon += 1;
-                Console.WriteLine($"{players[0].Name} selected {(HandType)players[0].Hand}\n"
-                                 + $"{players[1].Name} selected {(HandType)players[1].Hand}\n");
-                Console.WriteLine($"{(HandType)players[1].Hand} beats {(HandType)players[0].Hand}!\n"
+                Console.WriteLine($"{players[0].Name} selected {players[0].Hand.Name}\n"
+                                 + $"{players[1].Name} selected {players[1].Hand.Name}\n");
+                Console.WriteLine($"{players[1].Hand.Name} beats {players[0].Hand.Name}!\n"
                                  + $"{players[1].Name} wins this round!\n");
                 Console.WriteLine("Press enter to continue");
                 Console.ReadLine();
