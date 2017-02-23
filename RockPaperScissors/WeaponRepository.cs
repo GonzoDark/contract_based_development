@@ -10,7 +10,7 @@ namespace RockPaperScissors
     {
         public List<Weapon> Weapons = new List<Weapon>();
 
-        public WeaponRepository()
+        public WeaponRepository() //overload with type
         {            
             Weapons.Add(new Weapon { Name = "Fire", Beats = new List<string> { "Paper", "Scissor" } });
             Weapons.Add(new Weapon { Name = "Rock", Beats = new List<string> { "Scissor", "Fire" } });
